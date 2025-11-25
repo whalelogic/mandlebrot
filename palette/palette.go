@@ -1,35 +1,81 @@
+// Package palette provides color palettes and interpolation functions.
 package palette
 
 import (
 	"image/color"
 	"sort"
-	)
+)
 
-// Palette defines a color palette with a name and a set of colors.
+// Color holds a position (Step 0..1) and a color.
+// If Step is zero for multiple entries, Normalize will evenly distribute.
 type Color struct {
-	Step   float64
-	Colors color.Color
+	Step  float64
+	Color color.Color
 }
-
 
 type ColorMap struct {
-	Keyword string 
-	Colors []Color
+	Keyword string
+	Colors  []Color
 }
 
+// ColorPalettes contains palettes you can choose from. All steps should ideally be in range [0,1].
+// If some entries have Step==0 they will be normalized at runtime by Normalize().
+var ColorPalettes = []ColorMap{
+	{"NebulaSpectre", []Color{
+		{0.0,  color.RGBA{0x09, 0x04, 0x20, 0xff}}, // deep violet
+		{0.15, color.RGBA{0x3A, 0x0F, 0x73, 0xff}}, // purple
+		{0.35, color.RGBA{0x8D, 0x1A, 0xA8, 0xff}}, // magenta
+		{0.55, color.RGBA{0xE7, 0x36, 0x7F, 0xff}}, // hot pink
+		{0.75, color.RGBA{0x3B, 0xD6, 0xC2, 0xff}}, // cyan–teal
+		{1.0,  color.RGBA{0xF0, 0xFF, 0xFF, 0xff}}, // bright highlight
+	}},
 
+	{"MonochromeSlate", []Color{
+		{0.0, color.RGBA{0x00, 0x00, 0x00, 0xff}},
+		{0.5, color.RGBA{0x70, 0x70, 0x70, 0xff}},
+		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
+	}},
+
+	{"MetallicChrome", []Color{
+		{0.0, color.RGBA{0x06, 0x0b, 0x14, 0xff}},
+		{0.2, color.RGBA{0x3a, 0x3f, 0x45, 0xff}},
+		{0.45, color.RGBA{0x9e, 0xae, 0xb4, 0xff}},
+		{0.7, color.RGBA{0xe7, 0xd8, 0xb0, 0xff}},
+		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
+	}},
+
+	{"ThermalHeat", []Color{
+		{0.0, color.RGBA{0x00, 0x00, 0x00, 0xff}},
+		{0.25, color.RGBA{0x70, 0x00, 0x00, 0xff}},
+		{0.5, color.RGBA{0xff, 0x40, 0x00, 0xff}},
+		{0.75, color.RGBA{0xff, 0xd0, 0x00, 0xff}},
+		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
+	}},
+
+	{"AuroraArc", []Color{
+		{0.0, color.RGBA{0x01, 0x13, 0x1f, 0xff}},
+		{0.2, color.RGBA{0x03, 0x6b, 0x5f, 0xff}},
+		{0.45, color.RGBA{0x54, 0xe6, 0xb2, 0xff}},
+		{0.7, color.RGBA{0x95, 0x43, 0xd6, 0xff}},
+		{1.0, color.RGBA{0xf8, 0xf9, 0xff, 0xff}},
+	}},
+}
+
+// Get returns the ColorMap by keyword (case-sensitive) or nil if not found.
 func Get(keyword string) *ColorMap {
 	for i := range ColorPalettes {
 		if ColorPalettes[i].Keyword == keyword {
-			copy := colorPalettes[i]
-			Normalize(&copy)
-			return &copy
+			// return a copy so callers can mutate returned Colors/normalize safely
+			cpy := ColorPalettes[i]
+			Normalize(&cpy)
+			return &cpy
 		}
 	}
 	return nil
 }
 
-
+// Normalize fills in missing Step values (Step == 0) by evenly spacing them.
+// It also ensures first and last steps are 0 and 1 respectively if they are unspecified.
 func Normalize(cm *ColorMap) {
 	if cm == nil || len(cm.Colors) == 0 {
 		return
@@ -170,52 +216,4 @@ func clamp(v, lo, hi float64) float64 {
 	}
 	return v
 }
-
-var ColorPalettes = []ColorMap{
-	{"NebulaSpectre", []Color{
-		{0.0,  color.RGBA{0x09, 0x04, 0x20, 0xff}}, // deep violet
-		{0.15, color.RGBA{0x3A, 0x0F, 0x73, 0xff}}, // purple
-		{0.35, color.RGBA{0x8D, 0x1A, 0xA8, 0xff}}, // magenta
-		{0.55, color.RGBA{0xE7, 0x36, 0x7F, 0xff}}, // hot pink
-		{0.75, color.RGBA{0x3B, 0xD6, 0xC2, 0xff}}, // cyan–teal
-		{1.0,  color.RGBA{0xF0, 0xFF, 0xFF, 0xff}}, // bright highlight
-	}},
-
-	{"MonochromeSlate", []Color{
-		{0.0, color.RGBA{0x00, 0x00, 0x00, 0xff}},
-		{0.5, color.RGBA{0x70, 0x70, 0x70, 0xff}},
-		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
-	}},
-
-	{"MetallicChrome", []Color{
-		{0.0, color.RGBA{0x06, 0x0b, 0x14, 0xff}},
-		{0.2, color.RGBA{0x3a, 0x3f, 0x45, 0xff}},
-		{0.45, color.RGBA{0x9e, 0xae, 0xb4, 0xff}},
-		{0.7, color.RGBA{0xe7, 0xd8, 0xb0, 0xff}},
-		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
-	}},
-
-	{"ThermalHeat", []Color{
-		{0.0, color.RGBA{0x00, 0x00, 0x00, 0xff}},
-		{0.25, color.RGBA{0x70, 0x00, 0x00, 0xff}},
-		{0.5, color.RGBA{0xff, 0x40, 0x00, 0xff}},
-		{0.75, color.RGBA{0xff, 0xd0, 0x00, 0xff}},
-		{1.0, color.RGBA{0xff, 0xff, 0xff, 0xff}},
-	}},
-
-	{"AuroraArc", []Color{
-		{0.0, color.RGBA{0x01, 0x13, 0x1f, 0xff}},
-		{0.2, color.RGBA{0x03, 0x6b, 0x5f, 0xff}},
-		{0.45, color.RGBA{0x54, 0xe6, 0xb2, 0xff}},
-		{0.7, color.RGBA{0x95, 0x43, 0xd6, 0xff}},
-		{1.0, color.RGBA{0xf8, 0xf9, 0xff, 0xff}},
-	}},
-}
-
-
-
-
-
-
-	
 

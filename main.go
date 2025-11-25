@@ -7,14 +7,15 @@ import (
 	"image/png"
 	"math"
 	"os"
+	"os/exec"
 	"runtime"
 	"sync"
 
-	"github.com/whalelogic/mandelbrot/palette"
+	"github.com/whalelogic/mandlebrot/palette"
 )
 
 func main() {
-	// Flags for the renderer
+
 	width := flag.Int("width", 1600, "output image width in pixels")
 	height := flag.Int("height", 1200, "output image height in pixels")
 	xmin := flag.Float64("xmin", -2.2, "left x coordinate")
@@ -38,12 +39,10 @@ func main() {
 		}
 		os.Exit(2)
 	}
-	// ensure palette normalized
 	palette.Normalize(cmap)
 
 	img := image.NewRGBA(image.Rect(0, 0, *width, *height))
 
-	// Worker pattern to compute rows in parallel.
 	rows := make(chan int, *height)
 	var wg sync.WaitGroup
 	for w := 0; w < *concurrency; w++ {
@@ -74,11 +73,14 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Printf("Saved %s (%dx%d) using palette %s\n", *outfile, *width, *height, *pal)
+	fmt.Println("Opening image with feh...")
+	// Open image with feh (Linux)
+	exec.Command("feh", *outfile).Start()
 }
 
 // computeRow computes a single row y and writes pixels into img.
 func computeRow(img *image.RGBA, y, width, height int, xmin, xmax, ymin, ymax float64, iters int, cmap *palette.ColorMap, smooth bool) {
-	for x := 0; x < width; x++ {
+	for x := range width {
 		// map pixel to complex plane
 		cre := xmin + (float64(x)/float64(width))*(xmax-xmin)
 		cim := ymin + (float64(y)/float64(height))*(ymax-ymin)
@@ -107,8 +109,7 @@ func computeRow(img *image.RGBA, y, width, height int, xmin, xmax, ymin, ymax fl
 			} else {
 				t = float64(iter) / float64(iters)
 			}
-			// optionally warp t for aesthetic (gamma)
-			// t = math.Pow(t, 0.8)
+			t = math.Pow(t, 0.8)
 		}
 
 		clr := cmap.Interpolate(t)
@@ -116,11 +117,9 @@ func computeRow(img *image.RGBA, y, width, height int, xmin, xmax, ymin, ymax fl
 	}
 }
 
-// mandelbrotIterations calculates standard escape-time iterations and returns (n, z_n)
-// z_n is the last computed z value (useful for smoothing).
 func mandelbrotIterations(c complex128, maxIter int) (int, complex128) {
 	var z complex128
-	for n := 0; n < maxIter; n++ {
+	for n := range maxIter {
 		z = z*z + c
 		if real(z)*real(z)+imag(z)*imag(z) > 4.0 {
 			return n, z
