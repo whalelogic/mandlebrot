@@ -1,5 +1,7 @@
 # Mandelbrot Renderer (Go)
 
+> See image and diagram below
+
 A fast, extensible Mandelbrot fractal generator written in Go.\
 Supports multiple color palettes, configurable image dimensions,
 iteration limits, and automatic image preview using **feh** on Linux.
