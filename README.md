@@ -1,4 +1,4 @@
-# Mandelbrot Renderer (Go)
+# Mandelbrot Renderer in Go
 
 > See image and diagram below
 
