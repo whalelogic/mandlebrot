@@ -55,11 +55,14 @@ The application will:
                                       algorithm
   ------------------------------------------------------------------------
 
+
+<br>
 Example:
 
 ``` bash
 go run main.go -width 1920 -height 1080 -iters 1500 -palette Inferno -outfile fractal.png
 ```
+<br>
 
 ------------------------------------------------------------------------
 
@@ -82,6 +85,18 @@ flowchart TD
     J -->|Yes| K[Open Image with feh]
     J -->|No| L[Exit]
 ```
+---
+
+<br>
+
+## Rendered Mandlebrot Image with "NebulaSpectre" flag. 
+e.g. `go run main.go -palette "NebulaSpectre" -outfile /nebspec.png`
+<br>
+<img width="1036" height="679" alt="image" src="https://github.com/user-attachments/assets/067e01a7-6b06-49bb-a0ef-bfbedc85359c" />
+
+---
+
+<br>
 
 ------------------------------------------------------------------------
 
