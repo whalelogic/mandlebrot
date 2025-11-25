@@ -11,21 +11,19 @@ iteration limits, and automatic image preview using **feh** on Linux.
 ## Features
 
 -   High‑performance Mandelbrot set renderer in Go
--   Multiple color palettes (e.g., `MonochromeSlate`, `Inferno`,
-    `Plasma`, etc.)
+-   Multiple color palettes (e.g., `MonochromeSlate`, `NebulaSpectre`,
+    `AuroraArc`, `ThermalHeat`, etc.)
 -   Custom image sizing and iteration depth
 -   PNG output
 -   Optional automatic preview via `feh`
--   Clean and simple CLI interface
+-   Clean and simple CLI interface (working on this)
 
 ------------------------------------------------------------------------
 
 ## Example Usage
 
-This is the exact command sequence used during development:
-
 ``` bash
-🦀 whaler@fedora ~/github/mandlebrot (git)-[main]- go run main.go     -palette MonochromeSlate     -outfile /outfile/monochrome_mandlebrot.png
+🦀 go run main.go     -palette MonochromeSlate     -outfile /outfile/monochrome_mandlebrot.png
 ```
 
 The application will:
@@ -166,7 +164,7 @@ projects.
 
 ## Author
 
-**whalelogic / Keith**\
+**whalelogic / Keith Thomson**\
 Developer, cloud engineer, and fractal enthusiast.
 
 
