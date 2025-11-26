@@ -16,6 +16,12 @@ import (
 
 func main() {
 
+	// 🥋TODO 
+	// 🎇 Add cmd cmd for rendering image with feh on Linux
+	// ⏳Add option for smooth coloring vs discrete
+	// ⏳Add option for output format (png, jpg, etc)
+
+	// Command-line flags
 	width := flag.Int("width", 1600, "output image width in pixels")
 	height := flag.Int("height", 1200, "output image height in pixels")
 	xmin := flag.Float64("xmin", -2.2, "left x coordinate")
@@ -27,6 +33,7 @@ func main() {
 	pal := flag.String("palette", "NebulaSpectre", "palette name (case-sensitive)")
 	concurrency := flag.Int("procs", runtime.NumCPU(), "concurrent worker count")
 	smooth := flag.Bool("smooth", true, "use smooth coloring (continuous escape-time)")
+	feh := flag.Bool("feh", true, "open image with feh after rendering (Linux only)")
 	flag.Parse()
 
 	runtime.GOMAXPROCS(*concurrency)
@@ -74,8 +81,15 @@ func main() {
 	}
 	fmt.Printf("Saved %s (%dx%d) using palette %s\n", *outfile, *width, *height, *pal)
 	fmt.Println("Opening image with feh...")
+
 	// Open image with feh (Linux)
-	exec.Command("feh", *outfile).Start()
+	if *feh {
+		cmd := exec.Command("feh", *outfile)
+		if err := cmd.Start(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to open image with feh: %v\n", err)
+			os.Exit(1)
+		}
+	}
 }
 
 // computeRow computes a single row y and writes pixels into img.
