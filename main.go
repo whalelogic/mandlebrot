@@ -16,12 +16,6 @@ import (
 
 func main() {
 
-	// 🥋TODO 
-	// 🎇 Add cmd cmd for rendering image with feh on Linux
-	// ⏳Add option for smooth coloring vs discrete
-	// ⏳Add option for output format (png, jpg, etc)
-
-	// Command-line flags
 	width := flag.Int("width", 1600, "output image width in pixels")
 	height := flag.Int("height", 1200, "output image height in pixels")
 	xmin := flag.Float64("xmin", -2.2, "left x coordinate")
